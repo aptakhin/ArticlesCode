@@ -13,7 +13,7 @@ public:
 
 enum Code
 {
-	STRING
+	STRING = 1
 };
 
 class StringMessage : public Message

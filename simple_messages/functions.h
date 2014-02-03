@@ -51,20 +51,45 @@ private:
 		:	code(code),
 			object(object),
 			call(recv),
-			arg_type(arg_type) {}
+			arg_type(arg_type)
+		{
+		}
+	};
+
+	// Variant for lambda (Arg)->void
+	template <typename Function>
+	struct SubscriberImpl
+	{
+		static Subscriber make(int code, Function func)
+		{
+			typedef typename function_traits<Function>::function FType;
+			auto& arg_type = typeid(typename FType::argument_type);
+			auto pass = (void(*) (const Message&)) to_function_pointer(func); // Bdysh!
+			return std::move(Subscriber(code, nullptr, pass, arg_type));
+		}
+	};
+
+	// Variant for std::function<void <T>>
+	template <typename Arg>
+	struct SubscriberImpl<std::function<void(const Arg&)>>
+	{
+		static Subscriber make(int code, std::function<void (const Arg&)> func)
+		{
+			auto& arg_type = typeid(const Arg);
+			auto pass = *((std::function<void (const Message&)>*) &func); // Bdysh!
+			return std::move(Subscriber(code, nullptr, pass, arg_type));
+		}
 	};
 
 public:
 
 	Messanger() {}
 
-	template <typename F>
-	void subscribe(int code, F func)
+	template <typename Function>
+	void subscribe(int code, Function func)
 	{
-		typedef typename function_traits<F>::function FType;
-		auto& arg_type = typeid(typename FType::argument_type);
-		auto pass = (void(*) (const Message&)) to_function_pointer(func); // Bdysh!
-		subscribers_.emplace_back(Subscriber(code, nullptr, pass, arg_type));
+		auto fin = SubscriberImpl<Function>::make(code, func);
+		subscribers_.emplace_back(std::move(fin));
 	}
 
 	void send(const Message& msg)
