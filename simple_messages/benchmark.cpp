@@ -61,7 +61,7 @@ int main()
 	double ratio_sum = 0;
 	int    ratio_num = 0;
 
-	const int Tests = 10000000;
+	const int Tests = 100000000;
 
 	StringMessage test_message("Hello, messages!");
 
@@ -77,21 +77,21 @@ int main()
 		auto end1   = std::chrono::steady_clock::now();
 
 		auto time1  = duration_cast<milliseconds>(end1 - start1).count();
-		std::cout << "Slow:  " << time1 << "ms.\n";
+		std::cout << "Slow:  " << time1 << "ms. V =" << int(double(Tests) / time1 * 1000) << std::endl;
 
 		auto start2 = steady_clock::now();
 		for (int i = 0; i < Tests; ++i)
 			str_messanger.send(test_message);
 		auto end2   = std::chrono::steady_clock::now();
 		auto time2  = duration_cast<milliseconds>(end2 - start2).count();
-		std::cout << "Fast:  " << time2 << "ms.\n";
+		std::cout << "Fast:  " << time2 << "ms. V =" << int(double(Tests) / time2 * 1000) << std::endl;
 		
 		double ratio = double(time2) / time1;
-		std::cout << "Ratio: " << ratio << "\n";
+		std::cout << "Ratio: " << ratio << std::endl;
 		ratio_sum += ratio;
 		++ratio_num;
 		ratio_avg = ratio_sum / ratio_num;
-		std::cout << "Ratio AVG: " << ratio_avg << " (" << ratio_num << ")";
+		std::cout << "Ratio AVG: " << ratio_avg << " " << (1 / ratio_avg ) << " (" << ratio_num << ")" << std::endl;
 	}
 
 	return 0;

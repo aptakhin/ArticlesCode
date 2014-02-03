@@ -16,14 +16,7 @@ struct function_traits
 template <typename ClassType, typename ReturnType, typename... Args>
 struct function_traits<ReturnType(ClassType::*)(Args...) const>
 {
-	typedef ReturnType(*pointer)(Args...);
-	typedef std::function<ReturnType(Args...)> function;
-};
-
-template <typename ReturnType, typename... Args>
-struct function_traits<std::function<ReturnType(Args...)> const>
-{
-	typedef ReturnType(*pointer)(Args...);
+	typedef ReturnType (*pointer)(Args...);
 	typedef std::function<ReturnType(Args...)> function;
 };
 
@@ -88,8 +81,7 @@ public:
 	template <typename Function>
 	void subscribe(int code, Function func)
 	{
-		auto fin = SubscriberImpl<Function>::make(code, func);
-		subscribers_.emplace_back(std::move(fin));
+		subscribers_.emplace_back(std::move(SubscriberImpl<Function>::make(code, func)));
 	}
 
 	void send(const Message& msg)
