@@ -50,18 +50,18 @@ private:
 
 int main()
 {
-	Messenger messenger;
+	Messenger messanger;
 	std::function<void(const StringMessage&)> func = [](const StringMessage& msg){};
-	messenger.subscribe(STRING, [](const StringMessage& msg){});
+	messanger.subscribe(STRING, [](const StringMessage& msg){});
 
-	StringMessenger str_messenger;
-	str_messenger.subscribe(STRING, func);
+	StringMessenger str_messanger;
+	str_messanger.subscribe(STRING, func);
 
 	double ratio_avg = 0;
 	double ratio_sum = 0;
 	int    ratio_num = 0;
 
-	const int Tests = 100000000;
+	const int Tests = 5000000;
 
 	StringMessage test_message("Hello, messages!");
 
@@ -73,25 +73,25 @@ int main()
 
 		auto start1 = steady_clock::now();
 		for (int i = 0; i < Tests; ++i)
-			messenger.send(test_message);
+			messanger.send(test_message);
 		auto end1   = std::chrono::steady_clock::now();
 
 		auto time1  = duration_cast<milliseconds>(end1 - start1).count();
-		std::cout << "Slow:  " << time1 << "ms. V =" << int(double(Tests) / time1 * 1000) << std::endl;
+		std::printf("Msg: %5d ms\n", time1);
 
 		auto start2 = steady_clock::now();
 		for (int i = 0; i < Tests; ++i)
-			str_messenger.send(test_message);
+			str_messanger.send(test_message);
 		auto end2   = std::chrono::steady_clock::now();
 		auto time2  = duration_cast<milliseconds>(end2 - start2).count();
-		std::cout << "Fast:  " << time2 << "ms. V =" << int(double(Tests) / time2 * 1000) << std::endl;
-		
-		double ratio = double(time2) / time1;
-		std::cout << "Ratio: " << ratio << std::endl;
+		std::printf("Str: %5d ms\n", time2);
+				
+		double ratio = double(time1) / time2;
+		std::printf("Ratio: %.1lf\n", ratio);
 		ratio_sum += ratio;
 		++ratio_num;
 		ratio_avg = ratio_sum / ratio_num;
-		std::cout << "Ratio AVG: " << ratio_avg << " " << (1 / ratio_avg ) << " (" << ratio_num << ")" << std::endl;
+		std::printf("Ratio avg: %.1lf (%d)\n", ratio_avg, ratio_num);
 	}
 
 	return 0;
