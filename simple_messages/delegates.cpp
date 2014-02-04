@@ -17,9 +17,9 @@ private:
 		void*     object;
 		Receiver* method;
 
-		std::type_index arg_type;
+		const std::type_info& arg_type;
 
-		Subscriber(int code, void* object, Receiver* method, std::type_index arg_type)
+		Subscriber(int code, void* object, Receiver* method, const std::type_info& arg_type)
 		:	code(code),
 			object(object),
 			method(method),
@@ -39,13 +39,13 @@ public:
 	void subscribe(int code, T* object, void (T::* method)(const LikeMessage&))
 	{
 		void (T::* sign)(const Message&) = (void (T::*)(const Message&))method; // Bdysh!
-		const std::type_index& arg_type = typeid(const LikeMessage);
+		const std::type_info& arg_type = typeid(const LikeMessage);
 		subscribers_.push_back(Subscriber(code, object, NewDelegate(object, sign), arg_type));
 	}
 
 	void send(const Message& msg)
 	{
-		std::type_index arg_type = typeid(msg);
+		const std::type_info& arg_type = typeid(msg);
 		for (SubscribersCI i = subscribers_.begin(); i != subscribers_.end(); ++i)
 		{
 			if (i->code == msg.code)
