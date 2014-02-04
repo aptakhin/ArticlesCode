@@ -3,9 +3,9 @@
 
 int main()
 {
-	Messanger messanger;
+	Messenger messenger;
 
-	messanger.subscribe(STRING, [](const StringMessage& msg)
+	messenger.subscribe(STRING, [](const StringMessage& msg)
 	{
 		std::cout << "Received (1): " << msg.message << std::endl;
 	});
@@ -14,9 +14,9 @@ int main()
 	{
 		std::cout << "Received (2): " << msg.message << std::endl;
 	};
-	messanger.subscribe(STRING, func);
+	messenger.subscribe(STRING, func);
 
-	messanger.send(StringMessage("Hello, messages!"));
+	messenger.send(StringMessage("Hello, messages!"));
 	return 0;
 }
 

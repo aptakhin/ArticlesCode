@@ -7,7 +7,7 @@
 #include <chrono>
 #include "functions.h"
 
-class StringMessanger
+class StringMessenger
 {
 private:
 	typedef std::function<void(const StringMessage&)> Receiver;
@@ -28,7 +28,7 @@ private:
 
 public:
 
-	StringMessanger() {}
+	StringMessenger() {}
 
 	void subscribe(int code, Receiver& recv)
 	{
@@ -50,12 +50,12 @@ private:
 
 int main()
 {
-	Messanger messanger;
+	Messenger messenger;
 	std::function<void(const StringMessage&)> func = [](const StringMessage& msg){};
-	messanger.subscribe(STRING, [](const StringMessage& msg){});
+	messenger.subscribe(STRING, [](const StringMessage& msg){});
 
-	StringMessanger str_messanger;
-	str_messanger.subscribe(STRING, func);
+	StringMessenger str_messenger;
+	str_messenger.subscribe(STRING, func);
 
 	double ratio_avg = 0;
 	double ratio_sum = 0;
@@ -73,7 +73,7 @@ int main()
 
 		auto start1 = steady_clock::now();
 		for (int i = 0; i < Tests; ++i)
-			messanger.send(test_message);
+			messenger.send(test_message);
 		auto end1   = std::chrono::steady_clock::now();
 
 		auto time1  = duration_cast<milliseconds>(end1 - start1).count();
@@ -81,7 +81,7 @@ int main()
 
 		auto start2 = steady_clock::now();
 		for (int i = 0; i < Tests; ++i)
-			str_messanger.send(test_message);
+			str_messenger.send(test_message);
 		auto end2   = std::chrono::steady_clock::now();
 		auto time2  = duration_cast<milliseconds>(end2 - start2).count();
 		std::cout << "Fast:  " << time2 << "ms. V =" << int(double(Tests) / time2 * 1000) << std::endl;

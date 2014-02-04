@@ -6,7 +6,7 @@
 #include "message.h"
 #include "delegate.h"
 
-class Messanger
+class Messenger
 {
 private:
 	typedef I_DELEGATE<void, const Message&> Receiver;
@@ -32,8 +32,6 @@ private:
 	typedef std::vector<Subscriber>::const_iterator SubscribersCI;
 
 public:
-
-	Messanger() {}
 
 	template <class T, class LikeMessage>
 	void subscribe(int code, T* object, void (T::* method)(const LikeMessage&))
@@ -73,10 +71,10 @@ public:
 
 int main()
 {
-	Messanger messanger;
+	Messenger messenger;
 	Printer print;
-	messanger.subscribe(STRING, &print, &Printer::print);
-	messanger.send(StringMessage("Hello, messages!"));
+	messenger.subscribe(STRING, &print, &Printer::print);
+	messenger.send(StringMessage("Hello, messages!"));
 	return 0;
 }
 

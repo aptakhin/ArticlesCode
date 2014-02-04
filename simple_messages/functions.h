@@ -27,7 +27,7 @@ to_function_pointer(Function& lambda)
 	return static_cast<typename function_traits<Function>::pointer>(lambda);
 }
 
-class Messanger
+class Messenger
 {
 private:
 	typedef std::function<void(const Message&)> Receiver;
@@ -75,8 +75,6 @@ private:
 	};
 
 public:
-
-	Messanger() {}
 
 	template <typename Function>
 	void subscribe(int code, Function func)
