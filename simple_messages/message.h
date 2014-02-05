@@ -23,3 +23,9 @@ public:
 
 	const std::string message;
 };
+
+template <class Base, class Derived>
+bool is_sliced(const Derived* der)
+{
+	return (void*) der != (const Base*) der;
+}

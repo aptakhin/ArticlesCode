@@ -3,6 +3,7 @@
 #include <iostream>
 #include <typeindex>
 #include <vector>
+#include <cassert>
 #include "message.h"
 #include "delegate.h"
 
@@ -41,7 +42,15 @@ public:
 		subscribers_.push_back(Subscriber(code, object, NewDelegate(object, sign), arg_type));
 	}
 
-	void send(const Message& msg)
+	template <class LikeMessage>
+	void send(const LikeMessage& msg)
+	{
+		assert((!is_sliced<Message, LikeMessage>(&msg)));
+		send_impl(msg);
+	}
+
+private:
+	void send_impl(const Message& msg)
 	{
 		const std::type_info& arg_type = typeid(msg);
 		for (SubscribersCI i = subscribers_.begin(); i != subscribers_.end(); ++i)
@@ -56,7 +65,6 @@ public:
 	}
 
 private:
-
 	Subscribers subscribers_;
 };
 

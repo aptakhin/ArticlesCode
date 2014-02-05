@@ -5,6 +5,7 @@
 #include <typeinfo>
 #include <typeindex>
 #include <vector>
+#include <cassert>
 #include "message.h"
 
 // [http://meh.schizofreni.co/programming/magic/2013/01/23/function-pointer-from-lambda.html]
@@ -56,8 +57,12 @@ private:
 		static Subscriber make(int code, Function func)
 		{
 			typedef typename function_traits<Function>::function FType;
-			auto& arg_type = typeid(typename FType::argument_type);
-			auto pass = (void(*) (const Message&)) to_function_pointer(func); // Bdysh!
+			typedef typename FType::argument_type Arg;
+			auto& arg_type = typeid(Arg);
+			typedef std::remove_reference<Arg>::type ArgNoRef;
+			static_assert(std::is_base_of<Message, ArgNoRef>::value,
+				"Argument type not derived from base Message");
+			auto pass = (void(*) (const Message&)) to_function_pointer(func); 
 			return std::move(Subscriber(code, nullptr, pass, arg_type));
 		}
 	};
@@ -68,6 +73,7 @@ private:
 	{
 		static Subscriber make(int code, std::function<void (const Arg&)> func)
 		{
+			static_assert(std::is_base_of<Message, Arg>::value, "Argument type not derived from base Message");
 			auto& arg_type = typeid(const Arg);
 			auto pass = *((std::function<void (const Message&)>*) &func); // Bdysh!
 			return std::move(Subscriber(code, nullptr, pass, arg_type));
@@ -82,7 +88,15 @@ public:
 		subscribers_.emplace_back(std::move(SubscriberImpl<Function>::make(code, func)));
 	}
 
-	void send(const Message& msg)
+	template <class LikeMessage>
+	void send(const LikeMessage& msg)
+	{
+		assert((!is_sliced<Message, LikeMessage>(&msg)));
+		send_impl(msg);
+	}
+
+private:
+	void send_impl(const Message& msg)
 	{
 		const std::type_index arg_type = typeid(msg);
 		for (auto& i: subscribers_)
